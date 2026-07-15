@@ -165,15 +165,29 @@ async function submit() {
   margin-bottom: 1.5rem;
 }
 
+.form-head h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
 .back-link {
-  color: #94a3b8;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--text);
 }
 
 .post-form {
   display: grid;
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
 .post-form label {
@@ -183,32 +197,57 @@ async function submit() {
 
 .post-form label span {
   font-size: 0.9rem;
-  color: #cbd5e1;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
+/* 입력 필드 디자인 전체 개선 및 테마 연결 */
 .post-form select,
 .post-form input,
 .post-form textarea {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  padding: 0.8rem 1.1rem;
+  background: var(--bg);
+  color: var(--text);
   font: inherit;
   resize: vertical;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
 }
 
+/* 포커스 시 초록 테마 활성화 */
+.post-form select:focus,
+.post-form input:focus,
+.post-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.post-form select option {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.post-form input::placeholder,
+.post-form textarea::placeholder {
+  color: var(--muted);
+}
+
+/* 에러 메시지 */
 .form-error {
-  color: #fca5a5;
-  font-size: 0.9rem;
+  color: #ef4444;
+  font-size: 0.88rem;
+  font-weight: 500;
   margin: 0;
 }
 
+/* 액션 영역 */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
+  margin-top: 0.5rem;
 }
 
 .btn {
@@ -217,19 +256,33 @@ async function submit() {
   padding: 0.75rem 1.4rem;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.9rem;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  transition: all 0.2s ease;
 }
 
+/* 완료 버튼 - 초록 포인트 테마 */
 .btn.primary {
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff; /* 라이트 모드 가독성을 위해 흰색 글자 유지 */
 }
 
+.btn.primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+/* 취소 버튼 */
 .btn.ghost {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
 }
 
 .btn:disabled {
@@ -237,9 +290,11 @@ async function submit() {
   cursor: not-allowed;
 }
 
+/* 로딩 대기 안내 영역 */
 .state-msg {
   text-align: center;
-  color: #94a3b8;
-  padding: 2rem 0;
+  color: var(--text-muted);
+  padding: 3rem 0;
+  font-weight: 500;
 }
 </style>
