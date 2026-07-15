@@ -12,6 +12,12 @@ button {
   font: inherit;
 }
 
+/* 드롭다운 펼침 목록은 OS 기본(흰 배경)으로 렌더되어 밝은 글자가 안 보이는 문제 방지 */
+select option {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
 a {
   color: inherit;
 }
