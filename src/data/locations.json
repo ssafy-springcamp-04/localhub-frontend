@@ -1,0 +1,35 @@
+[
+  { "id": 101, "content_id": "126508", "content_type_id": "12", "title": "경복궁", "addr1": "서울특별시 종로구 사직로 161", "tel": "02-3700-3900", "first_image": "http://tong.visitkorea.or.kr/cms/resource/23/2678623_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/23/2678623_image3_1.jpg", "mapx": 126.9769, "mapy": 37.5788 },
+  { "id": 102, "content_id": "126515", "content_type_id": "12", "title": "북촌한옥마을", "addr1": "서울특별시 종로구 계동길 37", "tel": "02-2148-4160", "first_image": "http://tong.visitkorea.or.kr/cms/resource/96/2364596_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/96/2364596_image3_1.jpg", "mapx": 126.9850, "mapy": 37.5826 },
+  { "id": 103, "content_id": "126486", "content_type_id": "12", "title": "남산서울타워", "addr1": "서울특별시 용산구 남산공원길 105", "tel": "02-3455-9277", "first_image": null, "first_image2": null, "mapx": 126.9882, "mapy": 37.5512 },
+  { "id": 104, "content_id": "126520", "content_type_id": "12", "title": "창덕궁", "addr1": "서울특별시 종로구 율곡로 99", "tel": "02-3668-2300", "first_image": "http://tong.visitkorea.or.kr/cms/resource/00/2611500_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/00/2611500_image3_1.jpg", "mapx": 126.9915, "mapy": 37.5794 },
+
+  { "id": 201, "content_id": "142800", "content_type_id": "14", "title": "국립중앙박물관", "addr1": "서울특별시 용산구 서빙고로 137", "tel": "02-2077-9000", "first_image": "http://tong.visitkorea.or.kr/cms/resource/19/1892019_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/19/1892019_image3_1.jpg", "mapx": 126.9804, "mapy": 37.5240 },
+  { "id": 202, "content_id": "142805", "content_type_id": "14", "title": "예술의전당", "addr1": "서울특별시 서초구 남부순환로 2406", "tel": "02-580-1300", "first_image": null, "first_image2": null, "mapx": 127.0119, "mapy": 37.4795 },
+  { "id": 203, "content_id": "142810", "content_type_id": "14", "title": "국립현대미술관 서울", "addr1": "서울특별시 종로구 삼청로 30", "tel": "02-3701-9500", "first_image": "http://tong.visitkorea.or.kr/cms/resource/45/2612345_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/45/2612345_image3_1.jpg", "mapx": 126.9799, "mapy": 37.5787 },
+
+  { "id": 301, "content_id": "150001", "content_type_id": "15", "title": "여의도 봄꽃축제", "addr1": "서울특별시 영등포구 여의동로 330", "tel": "02-2670-3114", "first_image": "http://tong.visitkorea.or.kr/cms/resource/48/2955748_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/48/2955748_image3_1.jpg", "mapx": 126.9327, "mapy": 37.5285 },
+  { "id": 302, "content_id": "150002", "content_type_id": "15", "title": "서울숲 재즈 페스티벌", "addr1": "서울특별시 성동구 뚝섬로 273", "tel": null, "first_image": null, "first_image2": null, "mapx": 127.0378, "mapy": 37.5443 },
+  { "id": 303, "content_id": "150003", "content_type_id": "15", "title": "서울등축제", "addr1": "서울특별시 중구 청계천로", "tel": "02-2290-6114", "first_image": null, "first_image2": null, "mapx": 126.9784, "mapy": 37.5696 },
+
+  { "id": 401, "content_id": "250001", "content_type_id": "25", "title": "고궁 나들이 코스", "addr1": "서울특별시 종로구 일대", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9770, "mapy": 37.5760 },
+  { "id": 402, "content_id": "250002", "content_type_id": "25", "title": "한강 라이딩 코스", "addr1": "서울특별시 영등포구 ~ 광진구", "tel": null, "first_image": null, "first_image2": null, "mapx": null, "mapy": null },
+
+  { "id": 501, "content_id": "280001", "content_type_id": "28", "title": "한강 잠원 수상레저", "addr1": "서울특별시 서초구 신반포로11길 40", "tel": "02-3780-0501", "first_image": "http://tong.visitkorea.or.kr/cms/resource/12/2657012_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/12/2657012_image3_1.jpg", "mapx": 127.0114, "mapy": 37.5183 },
+  { "id": 502, "content_id": "280002", "content_type_id": "28", "title": "북한산 국립공원", "addr1": "서울특별시 성북구 보국문로 262", "tel": "02-909-0497", "first_image": null, "first_image2": null, "mapx": 127.0056, "mapy": 37.6586 },
+  { "id": 503, "content_id": "280003", "content_type_id": "28", "title": "월드컵공원 자전거길", "addr1": "서울특별시 마포구 하늘공원로 84", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.8783, "mapy": 37.5716 },
+
+  { "id": 601, "content_id": "320001", "content_type_id": "32", "title": "명동 부티크 호텔", "addr1": "서울특별시 중구 명동8길 27", "tel": "02-777-0001", "first_image": "http://tong.visitkorea.or.kr/cms/resource/30/1234530_image2_1.jpg", "first_image2": "http://tong.visitkorea.or.kr/cms/resource/30/1234530_image3_1.jpg", "mapx": 126.9856, "mapy": 37.5636 },
+  { "id": 602, "content_id": "320002", "content_type_id": "32", "title": "홍대 게스트하우스", "addr1": "서울특별시 마포구 어울마당로 65", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9234, "mapy": 37.5561 },
+  { "id": 603, "content_id": "320003", "content_type_id": "32", "title": "종로 한옥 스테이", "addr1": "서울특별시 종로구 북촌로", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9846, "mapy": 37.5813 },
+
+  { "id": 701, "content_id": "380001", "content_type_id": "38", "title": "광장시장", "addr1": "서울특별시 종로구 창경궁로 88", "tel": "02-2267-0291", "first_image": null, "first_image2": null, "mapx": 126.9997, "mapy": 37.5701 },
+  { "id": 702, "content_id": "380002", "content_type_id": "38", "title": "동대문 디자인플라자(DDP)", "addr1": "서울특별시 중구 을지로 281", "tel": "02-2153-0000", "first_image": null, "first_image2": null, "mapx": 127.0094, "mapy": 37.5665 },
+  { "id": 703, "content_id": "380003", "content_type_id": "38", "title": "가로수길", "addr1": "서울특별시 강남구 신사동", "tel": null, "first_image": null, "first_image2": null, "mapx": 127.0231, "mapy": 37.5205 },
+  { "id": 704, "content_id": "380004", "content_type_id": "38", "title": "남대문시장", "addr1": "서울특별시 중구 남대문시장4길 21", "tel": "02-753-2805", "first_image": null, "first_image2": null, "mapx": 126.9776, "mapy": 37.5599 },
+
+  { "id": 801, "content_id": "390001", "content_type_id": "39", "title": "광장시장 빈대떡 골목", "addr1": "서울특별시 종로구 창경궁로 88", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9997, "mapy": 37.5701 },
+  { "id": 802, "content_id": "390002", "content_type_id": "39", "title": "익선동 한식당", "addr1": "서울특별시 종로구 수표로28길", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9911, "mapy": 37.5735 },
+  { "id": 803, "content_id": "390003", "content_type_id": "39", "title": "을지로 노포 거리", "addr1": "서울특별시 중구 을지로", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9910, "mapy": 37.5660 },
+  { "id": 804, "content_id": "390004", "content_type_id": "39", "title": "망원시장 먹자골목", "addr1": "서울특별시 마포구 포은로8길 14", "tel": null, "first_image": null, "first_image2": null, "mapx": 126.9026, "mapy": 37.5556 }
+]
