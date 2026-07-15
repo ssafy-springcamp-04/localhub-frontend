@@ -10,28 +10,36 @@
   <section class="search-wrapper">
     <div class="search-container">
       <span class="search-icon">🔍</span>
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="장소명 또는 주소(구)를 입력하세요... (예: 경복궁, 강남)" 
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="장소명을 입력하세요... (예: 경복궁, 롯데월드)"
         @input="handleSearch"
       />
       <button v-if="searchQuery" class="clear-btn" @click="clearSearch">✕</button>
     </div>
   </section>
 
-  <!-- 가로로 나열되는 구 선택 토글 바 영역 -->
+  <!-- 카테고리(종류) 토글 바 영역 -->
   <section class="filter-wrapper">
     <div class="filter-container">
-      <button 
-        v-for="district in districts" 
-        :key="district"
-        :class="['filter-btn', { active: selectedDistrict === district }]"
-        @click="selectDistrict(district)"
+      <button
+        v-for="opt in categoryOptions"
+        :key="opt.code"
+        :class="['filter-btn', { active: selectedType === opt.code }]"
+        @click="selectCategory(opt.code)"
       >
-        {{ district }}
+        {{ opt.label }}
       </button>
     </div>
+  </section>
+
+  <!-- 구(區) 필터 드롭다운 -->
+  <section class="district-wrapper">
+    <select class="district-select" v-model="selectedDistrict" @change="selectDistrict">
+      <option value="">전체 지역(구)</option>
+      <option v-for="d in districtOptions" :key="d" :value="d">{{ d }}</option>
+    </select>
   </section>
 
   <section class="map-card">
@@ -42,161 +50,159 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
+import { getMapPins, getDistricts } from '../api/locations.js'
+import { CATEGORIES } from '../constants/categories.js'
 
 const mapContainer = ref(null)
 let mapInstance = null
-let activeMarkers = [] // 화면에 그려진 마커들을 추적하고 지우기 위한 배열
+let clusterer = null
 
-const districts = ref([])
-const selectedDistrict = ref('전체')
-
-// 검색어 반응형 변수 정의
+// 카테고리(종류) 필터 (전체 + 8종), 구(區) 필터 (전체 + §2-5 목록)
+const categoryOptions = [{ code: '', label: '전체' }, ...CATEGORIES]
+const selectedType = ref('')
+const districtOptions = ref([])
+const selectedDistrict = ref('')
 const searchQuery = ref('')
 
-// 서울 주요 랜드마크 20개 대량 더미 데이터
-const defaultPlaces = [
-  // 종로구 (5곳)
-  { id: 1, title: '경복궁', latitude: 37.5796, longitude: 126.9770, gu: '종로구' },
-  { id: 2, title: '창덕궁', latitude: 37.5794, longitude: 126.9910, gu: '종로구' },
-  { id: 3, title: '인사동 쌈지길', latitude: 37.5742, longitude: 126.9847, gu: '종로구' },
-  { id: 4, title: '북촌한옥마을', latitude: 37.5829, longitude: 126.9835, gu: '종로구' },
-  { id: 5, title: '광화문광장', latitude: 37.5721, longitude: 126.9769, gu: '종로구' },
-
-  // 용산구 (4곳)
-  { id: 6, title: 'N서울타워', latitude: 37.5511, longitude: 126.9882, gu: '용산구' },
-  { id: 7, title: '전쟁기념관', latitude: 37.5366, longitude: 126.9771, gu: '용산구' },
-  { id: 8, title: '국립중앙박물관', latitude: 37.5238, longitude: 126.9798, gu: '용산구' },
-  { id: 9, title: '이태원 세계음식거리', latitude: 37.5349, longitude: 126.9942, gu: '용산구' },
-
-  // 송파구 (3곳)
-  { id: 10, title: '롯데월드타워', latitude: 37.5125, longitude: 127.1025, gu: '송파구' },
-  { id: 11, title: '석촌호수', latitude: 37.5098, longitude: 127.1031, gu: '송파구' },
-  { id: 12, title: '올림픽공원', latitude: 37.5207, longitude: 127.1215, gu: '송파구' },
-
-  // 마포구 (4곳)
-  { id: 13, title: '홍대 걷고싶은거리', latitude: 37.5562, longitude: 126.9239, gu: '마포구' },
-  { id: 14, title: '망원시장', latitude: 37.5561, longitude: 126.9059, gu: '마포구' },
-  { id: 15, title: '하늘공원', latitude: 37.5681, longitude: 126.8848, gu: '마포구' },
-  { id: 16, title: '경의선 숲길', latitude: 37.5585, longitude: 126.9378, gu: '마포구' },
-
-  // 강남구 (4곳)
-  { id: 17, title: '코엑스몰', latitude: 37.5118, longitude: 127.0592, gu: '강남구' },
-  { id: 18, title: '가로수길', latitude: 37.5212, longitude: 127.0230, gu: '강남구' },
-  { id: 19, title: '봉은사', latitude: 37.5144, longitude: 127.0573, gu: '강남구' },
-  { id: 20, title: '강남역 네거리', latitude: 37.4980, longitude: 127.0276, gu: '강남구' }
-]
+// 백엔드에서 불러온 좌표 보유 핀 원본
+let allPins = []
 
 onMounted(async () => {
   await nextTick()
 
-  const uniqueGus = [...new Set(defaultPlaces.map(place => place.gu))].sort()
-  districts.value = ['전체', ...uniqueGus]
-
-  if (window.kakao && window.kakao.maps) {
-    initMap(defaultPlaces)
-  } else {
-    console.error("Kakao Maps API가 아직 로드되지 않았습니다.")
+  if (!(window.kakao && window.kakao.maps)) {
+    console.error('Kakao Maps API가 아직 로드되지 않았습니다.')
+    return
   }
+  initMap()
+  await loadDistricts('')
+  await loadPins() // 초기 로드: 서울 포커스 유지 (fitBounds 안 함)
 })
 
-const initMap = (places) => {
+const initMap = () => {
   const container = mapContainer.value
   if (!container) return
-  
+
+  // 초기 진입/새로고침 시 서울 중심을 포커스
   const options = {
     center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-    level: 7
+    level: 8
   }
-
   mapInstance = new window.kakao.maps.Map(container, options)
-  updateMarkers(places)
+
+  // 축척(레벨)별 자동 클러스터링 — minLevel 이상(축소)에서 묶이고, 확대하면 개별 핀
+  // clusterer 라이브러리가 로드되지 않은 경우엔 null 로 두고 개별 마커로 폴백
+  if (window.kakao.maps.MarkerClusterer) {
+    clusterer = new window.kakao.maps.MarkerClusterer({
+      map: mapInstance,
+      averageCenter: true,
+      minLevel: 6,
+      gridSize: 80
+    })
+  } else {
+    console.warn('MarkerClusterer 미로드 — 개별 마커로 표시합니다.')
+  }
 }
 
-// 검색 및 토글 필터를 결합하여 데이터를 가공하는 핵심 함수
-const getFilteredPlaces = () => {
-  return defaultPlaces.filter(place => {
-    // 구 토글 조건
-    const matchesDistrict = selectedDistrict.value === '전체' || place.gu === selectedDistrict.value
-    
-    // 검색창 입력 조건 (이름 검색 및 주소/구 이름 매칭 허용)
-    const normalizedQuery = searchQuery.value.trim().toLowerCase()
-    const matchesQuery = !normalizedQuery || 
-                         place.title.toLowerCase().includes(normalizedQuery) || 
-                         place.gu.toLowerCase().includes(normalizedQuery)
-
-    return matchesDistrict && matchesQuery
-  })
+// 구 목록 로드 (계약서 §2-5) — 선택 타입에 존재하는 구만
+const loadDistricts = async (type) => {
+  try {
+    districtOptions.value = (await getDistricts(type)).items
+  } catch (err) {
+    districtOptions.value = []
+  }
 }
 
-// 구 토글 클릭 시
-const selectDistrict = (district) => {
-  selectedDistrict.value = district
-  updateMarkers(getFilteredPlaces())
+// 핀 로드 — 경량 지도 핀 API(§2-2)로 타입/구 서버 필터. limit 상한으로 과다 핀 방지.
+const loadPins = async () => {
+  const type = selectedType.value
+  const district = selectedDistrict.value
+  try {
+    const { items } = await getMapPins({ types: type || '', district, limit: 500 })
+    // §2-2 는 좌표 있는 항목만 반환하지만 방어적으로 한 번 더 필터
+    allPins = items.filter((p) => p.mapx != null && p.mapy != null)
+  } catch (err) {
+    allPins = []
+  }
+  // 구를 선택했을 때만 그 영역으로 확대, 그 외에는 서울 포커스 유지
+  updateMarkers(getFilteredPins(), Boolean(district))
+}
+
+// 검색어(장소명)는 불러온 핀에서 클라이언트 측 필터
+const getFilteredPins = () => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return allPins
+  return allPins.filter((p) => p.title.toLowerCase().includes(q))
+}
+
+// 카테고리 토글 클릭 → 구 목록 갱신 + 핀 재조회
+const selectCategory = async (code) => {
+  selectedType.value = code
+  selectedDistrict.value = '' // 타입 바뀌면 구 필터 초기화
+  await loadDistricts(code)
+  loadPins()
+}
+
+// 구 드롭다운 변경 → 핀 재조회
+const selectDistrict = () => {
+  loadPins()
 }
 
 // 실시간 검색 타이핑 시 이벤트 처리
 const handleSearch = () => {
-  updateMarkers(getFilteredPlaces())
+  updateMarkers(getFilteredPins(), false)
 }
 
 // 검색어 지우기 버튼 액션
 const clearSearch = () => {
   searchQuery.value = ''
-  updateMarkers(getFilteredPlaces())
+  updateMarkers(getFilteredPins(), false)
 }
 
-const updateMarkers = (places) => {
+let plainMarkers = [] // 클러스터러 미사용 시 개별 마커 추적
+
+const updateMarkers = (pins, fit) => {
   if (!mapInstance) return
 
-  // 기존 마커와 인포윈도우 제거
-  activeMarkers.forEach(item => {
-    item.marker.setMap(null)
-    if (item.infowindow) item.infowindow.close()
-  })
-  activeMarkers = []
+  // 기존 마커 제거 (클러스터러 사용/미사용 모두 대응)
+  if (clusterer) {
+    clusterer.clear()
+  } else {
+    plainMarkers.forEach((m) => m.setMap(null))
+    plainMarkers = []
+  }
 
   const bounds = new window.kakao.maps.LatLngBounds()
-  
-  const markerImageSrc = 'https://cdn-icons-png.flaticon.com/512/684/684908.png'
-  const imageSize = new window.kakao.maps.Size(36, 36)
-  const imageOption = { offset: new window.kakao.maps.Point(18, 36) }
-  const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption)
 
-  places.forEach((place) => {
-    const markerPosition = new window.kakao.maps.LatLng(place.latitude, place.longitude)
-
-    const marker = new window.kakao.maps.Marker({
-      position: markerPosition,
-      image: markerImage,
-      map: mapInstance
-    })
+  const markers = pins.map((place) => {
+    // 계약서: mapy = 위도(lat), mapx = 경도(lng)
+    // 마커 이미지는 Kakao 기본 핀 사용 (외부 이미지 의존 제거 → 로드 실패 위험 없음)
+    const position = new window.kakao.maps.LatLng(place.mapy, place.mapx)
+    const marker = new window.kakao.maps.Marker({ position })
 
     const infowindow = new window.kakao.maps.InfoWindow({
       content: `<div class="info-window">${place.title}</div>`
     })
-
-    window.kakao.maps.event.addListener(marker, 'mouseover', () => {
+    window.kakao.maps.event.addListener(marker, 'mouseover', () =>
       infowindow.open(mapInstance, marker)
-    })
+    )
+    window.kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close())
 
-    window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-      infowindow.close()
-    })
-
-    activeMarkers.push({ marker, infowindow })
-    bounds.extend(markerPosition)
+    bounds.extend(position)
+    return marker
   })
 
-  // 선택된 핀들의 범위에 맞춰 뷰포트 자동 세팅
-  if (places.length > 0) {
+  // 클러스터러가 있으면 일괄 등록, 없으면 개별 마커를 직접 지도에 표시 (폴백)
+  if (clusterer) {
+    clusterer.addMarkers(markers)
+  } else {
+    markers.forEach((m) => m.setMap(mapInstance))
+    plainMarkers = markers
+  }
+
+  // 구 선택 등 명시적 확대 요청 시에만 범위 맞춤
+  if (fit && pins.length > 0) {
     mapInstance.setBounds(bounds)
-    
-    // 특정 구 필터 혹은 검색 결과가 몇 개 없을 때 가장 이쁜 축척 유지
-    if (places.length > 1 && places.length < 5) {
-      mapInstance.setLevel(6)
-    } else if (places.length === 1) {
-      mapInstance.setLevel(5)
-    }
   }
 }
 </script>
@@ -305,6 +311,31 @@ const updateMarkers = (places) => {
   color: #ffffff;
   border-color: var(--accent);
   box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* 구(區) 필터 드롭다운 */
+.district-wrapper {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.district-select {
+  width: 100%;
+  max-width: 260px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.district-select:focus {
+  border-color: var(--accent);
 }
 
 .map-card {
