@@ -2,46 +2,77 @@
   <section>
     <div class="card">
       <h1>서울 지역 정보</h1>
-      <p>서울의 관광지, 문화시설, 쇼핑, 숙박, 축제행사 데이터를 카테고리별로 확인하세요.</p>
+      <p>서울의 관광지·문화시설·축제·쇼핑·숙박·음식점 등 8개 카테고리 정보를 확인하세요.</p>
     </div>
   </section>
 
   <section>
     <div class="grid-3">
-      <div class="card category-card" v-for="item in categories" :key="item.id">
-        <h2>{{ item.title }}</h2>
-        <p>{{ item.description }}</p>
-        <button class="category-button">바로가기</button>
-      </div>
+      <router-link
+        v-for="c in categories"
+        :key="c.code"
+        :to="`/places/${c.code}`"
+        class="card category-card"
+      >
+        <span class="category-emoji">{{ c.emoji }}</span>
+        <h2>{{ c.label }}</h2>
+        <p>{{ c.description }}</p>
+        <span class="category-go">바로가기 →</span>
+      </router-link>
     </div>
   </section>
 </template>
 
 <script setup>
-const categories = [
-  { id: 'tourist', title: '관광지', description: '서울의 주요 관광지를 다양한 목록으로 제공합니다.' },
-  { id: 'sports', title: '레포츠', description: '도심 속 레포츠 및 야외 활동 정보를 확인하세요.' },
-  { id: 'culture', title: '문화시설', description: '전시, 공연, 박물관 등 문화시설 정보를 제공합니다.' },
-  { id: 'shopping', title: '쇼핑', description: '서울의 쇼핑 스팟과 인기 상권을 소개합니다.' },
-  { id: 'stay', title: '숙박', description: '서울 숙박 시설 정보를 확인하세요.' },
-  { id: 'festival', title: '축제·공연·행사', description: '서울에서 열리는 다양한 행사 소식을 모았습니다.' }
-]
+import { CATEGORIES } from '../constants/categories.js'
+
+const DESCRIPTIONS = {
+  '12': { emoji: '🏛️', description: '경복궁·남산 등 서울의 대표 관광지를 소개합니다.' },
+  '14': { emoji: '🎨', description: '박물관·미술관·공연장 등 문화시설 정보입니다.' },
+  '15': { emoji: '🎉', description: '축제·공연·행사 일정을 한눈에 확인하세요.' },
+  '25': { emoji: '🗺️', description: '테마별 여행 코스를 따라 서울을 둘러보세요.' },
+  '28': { emoji: '🚴', description: '한강·북한산 등 도심 속 레포츠 정보입니다.' },
+  '32': { emoji: '🏨', description: '호텔·게스트하우스 등 서울 숙박 정보입니다.' },
+  '38': { emoji: '🛍️', description: '전통시장부터 쇼핑 명소까지 소개합니다.' },
+  '39': { emoji: '🍽️', description: '서울의 맛집과 먹거리 골목을 확인하세요.' }
+}
+
+const categories = CATEGORIES.map((c) => ({ ...c, ...DESCRIPTIONS[c.code] }))
 </script>
 
 <style scoped>
 .category-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 0.4rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
 }
 
-.category-button {
-  margin-top: 1rem;
-  padding: 0.85rem 1.2rem;
-  border: none;
-  background: #60a5fa;
-  color: #ffffff;
-  border-radius: 999px;
-  cursor: pointer;
+.category-card:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  transform: translateY(-2px);
+}
+
+.category-emoji {
+  font-size: 1.8rem;
+}
+
+.category-card h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.2rem;
+}
+
+.category-card p {
+  color: #cbd5e1;
+  flex: 1;
+}
+
+.category-go {
+  margin-top: 0.6rem;
+  color: #7dd3fc;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 </style>
