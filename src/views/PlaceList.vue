@@ -25,12 +25,12 @@
         </form>
 
         <div class="place-filters">
-          <select v-model="district" @change="reload">
+          <select v-model="district" @change="reloadFromFirst">
             <option value="">전체 지역(구)</option>
             <option v-for="d in districts" :key="d" :value="d">{{ d }}</option>
           </select>
 
-          <select v-model="sort" @change="reload">
+          <select v-model="sort" @change="reloadFromFirst">
             <option value="name">이름순</option>
             <option value="likes">추천순</option>
           </select>
@@ -83,6 +83,35 @@
           </div>
         </article>
       </div>
+
+      <!-- 페이지네이션 -->
+      <nav v-if="totalPages > 1" class="pagination" aria-label="페이지 이동">
+        <button class="page-btn" :disabled="page === 1" @click="changePage(page - 1)">이전</button>
+
+        <button v-if="pageNumbers[0] > 1" class="page-btn" @click="changePage(1)">1</button>
+        <span v-if="pageNumbers[0] > 2" class="page-ellipsis">…</span>
+
+        <button
+          v-for="p in pageNumbers"
+          :key="p"
+          class="page-btn"
+          :class="{ active: p === page }"
+          @click="changePage(p)"
+        >
+          {{ p }}
+        </button>
+
+        <span v-if="pageNumbers[pageNumbers.length - 1] < totalPages - 1" class="page-ellipsis">…</span>
+        <button
+          v-if="pageNumbers[pageNumbers.length - 1] < totalPages"
+          class="page-btn"
+          @click="changePage(totalPages)"
+        >
+          {{ totalPages }}
+        </button>
+
+        <button class="page-btn" :disabled="page === totalPages" @click="changePage(page + 1)">다음</button>
+      </nav>
     </template>
   </section>
 </template>
@@ -119,6 +148,22 @@ const searchText = ref('') // 입력 중인 검색어
 const activeKeyword = ref('') // 실제 적용된 검색어
 const district = ref('') // 구별 필터
 const sort = ref('name') // 정렬 (name | likes)
+
+const PAGE_SIZE = 12
+const page = ref(1) // 현재 페이지 (1부터)
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)))
+
+// 현재 페이지 주변으로 보여줄 페이지 번호 창(최대 5개)
+const pageNumbers = computed(() => {
+  const tp = totalPages.value
+  const win = 5
+  let start = Math.max(1, page.value - Math.floor(win / 2))
+  const end = Math.min(tp, start + win - 1)
+  start = Math.max(1, end - win + 1)
+  const arr = []
+  for (let p = start; p <= end; p++) arr.push(p)
+  return arr
+})
 
 // 좋아요 중복 방지
 const likedIds = ref(new Set(JSON.parse(localStorage.getItem(LIKED_KEY) || '[]')))
@@ -171,7 +216,9 @@ async function reload() {
       type,
       q: activeKeyword.value,
       district: district.value,
-      sort: sort.value
+      sort: sort.value,
+      page: page.value,
+      size: PAGE_SIZE
     })
     items.value = rows
     total.value = count
@@ -184,13 +231,27 @@ async function reload() {
   }
 }
 
-function submitSearch() {
+// 필터/검색/정렬 변경 → 1페이지부터 다시 조회
+function reloadFromFirst() {
+  page.value = 1
   reload()
+}
+
+// 페이지 이동 → 조회 후 상단으로 스크롤
+function changePage(p) {
+  if (p < 1 || p > totalPages.value || p === page.value) return
+  page.value = p
+  reload()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function submitSearch() {
+  reloadFromFirst()
 }
 
 function clearSearch() {
   searchText.value = ''
-  reload()
+  reloadFromFirst()
 }
 
 // 카테고리(탭) 전환 시 필터/검색/정렬 초기화 후 구 목록 + 목록 재조회
@@ -201,6 +262,7 @@ watch(
     activeKeyword.value = ''
     district.value = ''
     sort.value = 'name'
+    page.value = 1
     try {
       districts.value = (await getDistricts(type)).items
     } catch (err) {
@@ -475,5 +537,51 @@ watch(
 
 .state-msg.error {
   color: #ef4444;
+}
+
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2rem;
+}
+
+.page-btn {
+  min-width: 2.4rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background: var(--surface-strong);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.page-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  cursor: default;
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.page-ellipsis {
+  padding: 0 0.25rem;
+  color: var(--text-muted);
 }
 </style>
