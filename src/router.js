@@ -15,7 +15,10 @@ const routes = [
   { path: '/community/new', name: 'community-new', component: PostFormPage },
   { path: '/community/:id(\\d+)', name: 'community-detail', component: PostDetailPage },
   { path: '/community/:id(\\d+)/edit', name: 'community-edit', component: PostFormPage },
-  { path: '/map', component: MapPage }
+  { path: '/map', component: MapPage },
+  // 캘린더는 FullCalendar(무거운 의존성)를 쓰므로 지연 로딩 →
+  // 이 페이지 문제가 나도 홈/다른 페이지는 영향받지 않도록 격리
+  { path: '/calendar', component: () => import('./pages/CalendarPage.vue') }
 ]
 
 const router = createRouter({

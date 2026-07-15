@@ -142,6 +142,24 @@ export async function unlikeLocation(id) {
 }
 
 /**
+ * 축제(contentTypeId=15) 전체 조회 — 캘린더용.
+ * 백엔드 size 상한(100)을 고려해 페이지를 순회하며 모두 모은다.
+ * @returns {Promise<Array>} 축제 목록 아이템 배열 (event_start/event_end 포함)
+ */
+export async function getFestivals() {
+  const size = 100
+  const first = await getLocations({ type: '15', sort: 'name', page: 1, size })
+  const items = [...first.items]
+  const total = first.total ?? items.length
+  const pages = Math.ceil(total / size)
+  for (let page = 2; page <= pages; page++) {
+    const res = await getLocations({ type: '15', sort: 'name', page, size })
+    items.push(...res.items)
+  }
+  return items
+}
+
+/**
  * 지역정보 단건 조회 (계약서 §2-3)
  * GET /api/locations/{id}
  */
