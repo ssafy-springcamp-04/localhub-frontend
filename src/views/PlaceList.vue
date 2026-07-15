@@ -263,7 +263,9 @@ function clearSearch() {
 watch(
   currentType,
   async (type) => {
-    searchText.value = ''
+    // 지도 핀 클릭 등으로 넘어올 때 쿼리(q)가 있으면 검색어로 적용
+    const q0 = route.query.q
+    searchText.value = typeof q0 === 'string' ? q0 : ''
     activeKeyword.value = ''
     district.value = ''
     sort.value = 'name'
