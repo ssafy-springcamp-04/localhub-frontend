@@ -189,12 +189,14 @@ async function renderAll() {
 onMounted(async () => {
   try {
     stats.value = await getStats()
-    await renderAll()
   } catch (err) {
     error.value = true
   } finally {
     loading.value = false
   }
+  // loading=false 로 v-else(차트 영역)가 렌더된 뒤에 차트 생성
+  // (renderAll 내부의 nextTick 이 DOM 반영을 기다림)
+  if (stats.value) await renderAll()
 })
 
 // 테마 전환 시 차트 색 갱신
