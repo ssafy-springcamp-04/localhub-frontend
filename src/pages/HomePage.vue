@@ -27,11 +27,6 @@
         <p>Leaflet 지도로 서울 주요 명소를 한눈에 확인하세요.</p>
         <router-link to="/map">자세히 보기</router-link>
       </div>
-      <div class="card home-card">
-        <h2>챗봇</h2>
-        <p>서울 관광 정보와 게시글 검색을 돕는 대화형 안내를 이용해 보세요.</p>
-        <router-link to="/chatbot">자세히 보기</router-link>
-      </div>
     </div>
   </section>
 </template>

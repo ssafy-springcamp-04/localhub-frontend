@@ -8,7 +8,6 @@
         <router-link to="/categories">지역정보</router-link>
         <router-link to="/community">커뮤니티</router-link>
         <router-link to="/map">지도</router-link>
-        <router-link to="/chatbot">챗봇</router-link>
       </nav>
     </header>
 
@@ -19,10 +18,15 @@
     <footer class="app-footer">
       <p>서울 관광 정보, 커뮤니티, 지도, 챗봇을 한 곳에서</p>
     </footer>
+
+    <!-- 전 화면 공통 플로팅 챗봇 레이어 (라우트 없음) -->
+    <ChatWidget />
   </div>
+
 </template>
 
 <script setup>
+import ChatWidget from './components/chat/ChatWidget.vue'
 </script>
 
 <style>
