@@ -193,7 +193,7 @@ onMounted(async () => {
     error.value = true
   } finally {
     loading.value = false
-  }
+  }5c98d20 (fix(dashboard): 차트가 안 그려지던 문제 수정)
   // loading=false 로 v-else(차트 영역)가 렌더된 뒤에 차트 생성
   // (renderAll 내부의 nextTick 이 DOM 반영을 기다림)
   if (stats.value) await renderAll()
