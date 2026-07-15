@@ -8,6 +8,13 @@
 
   <section>
     <div class="grid-3">
+      <router-link to="/places/all" class="card category-card all-card">
+        <span class="category-emoji">🗂️</span>
+        <h2>전체 보기</h2>
+        <p>모든 카테고리의 지역 정보를 한 번에 둘러보세요.</p>
+        <span class="category-go">바로가기 →</span>
+      </router-link>
+
       <router-link
         v-for="c in categories"
         :key="c.code"
@@ -44,6 +51,11 @@ const categories = CATEGORIES
 </script>
 
 <style scoped>
+/* 전체 보기 카드 — 초록 포인트 테두리로 강조 */
+.all-card {
+  border-color: var(--accent);
+}
+
 /* 개별 카테고리 카드 */
 .category-card {
   display: flex;
