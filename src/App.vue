@@ -32,10 +32,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import ChatWidget from './components/chat/ChatWidget.vue'
-
-const isDarkTheme = ref(true)
+import { isDarkTheme } from './theme.js'
 
 const applyTheme = (dark) => {
   isDarkTheme.value = dark
@@ -65,25 +64,26 @@ onMounted(() => {
   color-scheme: dark;
   font-family: 'Noto Sans KR', sans-serif;
   
-  /* [Dark Theme] - 푸른빛을 빼고 깊은 숲속/차콜 톤으로 변경 */
-  --bg: #0d1510;                         /* 어두운 초록빛 블랙 */
-  --surface: rgba(20, 34, 25, 0.95);     /* 헤더/네비바 배경 */
-  --surface-strong: #1b2e22;             /* 푸터 배경 */
-  --card-bg: rgba(255, 255, 255, 0.04);   /* 카드 배경 (다크모드용 반투명) */
-  
+  /* [Dark Theme] - 정돈된 차콜-그린 톤 (탁한 반투명 대신 또렷한 솔리드 표면) */
+  --bg: #0f1512;                         /* 깊은 차콜 그린 (의도적 톤) */
+  --surface: rgba(24, 33, 28, 0.85);     /* 헤더/네비바 배경 (블러와 함께) */
+  --surface-strong: #161d1a;             /* 푸터 배경 */
+  --card-bg: #182320;                    /* 카드 배경 (솔리드 — 또렷하게 보이도록) */
+  --card-hover: #1e2b26;                 /* 카드 호버 시 살짝 밝은 표면 */
+
   /* 텍스트 & 경계선 */
-  --text: #f0f7f4;                       /* 살짝 초록빛이 도는 밝은 텍스트 */
-  --text-muted: #a3b899;                 /* 톤다운된 보조 텍스트 */
-  --muted: #708573;                      /* 어두운 보조 텍스트 */
-  --border: rgba(255, 255, 255, 0.08);   /* 섬세한 경계선 */
-  --shadow: rgba(0, 0, 0, 0.4);          /* 짙은 그림자 */
-  
+  --text: #eaf1ed;                       /* 밝고 중립적인 텍스트 */
+  --text-muted: #9caba2;                 /* 초록기 줄인 차분한 보조 텍스트 */
+  --muted: #6f7d75;                      /* 어두운 보조 텍스트 */
+  --border: rgba(255, 255, 255, 0.1);    /* 살짝 또렷한 경계선 */
+  --shadow: rgba(0, 0, 0, 0.45);         /* 짙은 그림자 */
+
   /* 포인트 컬러 (Forest Green 계열) */
   --link: #cbd5e1;
   --active: #4ade80;                     /* 활성화 링크 (밝은 초록) */
   --accent: #22c55e;                     /* 메인 초록 */
   --accent-strong: #16a34a;              /* 강조 초록 */
-  --accent-soft: rgba(34, 197, 94, 0.15); /* 버튼 등의 연한 배경 */
+  --accent-soft: rgba(34, 197, 94, 0.14); /* 버튼 등의 연한 배경 */
 }
 
 html.theme-light {
@@ -94,7 +94,8 @@ html.theme-light {
   --surface: #ffffff;                    /* 헤더는 깔끔한 화이트 */
   --surface-strong: #e8f3ec;             /* 푸터는 밝은 올리브 그레이 */
   --card-bg: #ffffff;                    /* 카드가 돋보이도록 순백색 지정 */
-  
+  --card-hover: #f7fbf8;                 /* 카드 호버 시 살짝 톤 변화 */
+
   /* 텍스트 & 경계선 */
   --text: #14291c;                       /* 깊은 초록빛의 블랙 */
   --text-muted: #4e6b5a;                 /* 부드러운 카키/그린 그레이 */
