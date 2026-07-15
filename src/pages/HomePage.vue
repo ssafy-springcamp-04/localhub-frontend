@@ -55,37 +55,41 @@
 .hero-overlay {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  min-height: 480px;
-  padding: 2.5rem;
+  gap: 2.5rem;
+  min-height: 640px;
+  padding: 3rem;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.1) 0%,
     rgba(255, 255, 255, 0) 32%,
-    rgba(13, 21, 16, 0) 58%,
-    rgba(13, 21, 16, 0.35) 100%
+    rgba(13, 21, 16, 0) 55%,
+    rgba(13, 21, 16, 0.4) 100%
   );
 }
 
+/* 텍스트는 반투명 패널 위에 올려 배경 위에서도 또렷하게 */
 .hero-text {
-  max-width: 640px;
+  max-width: 620px;
+  padding: 1.4rem 1.6rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .hero-text h1 {
   margin: 0 0 0.75rem;
-  font-size: 2.3rem;
+  font-size: 2.6rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #12281b;
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.65);
+  color: #0f2417;
 }
 
 .hero-text p {
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: #1c3627;
-  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: #1e3a29;
 }
 
 /* 카드를 히어로 박스 하단으로 밀어 배치 */
@@ -153,11 +157,11 @@
 @media (max-width: 720px) {
   .hero-overlay {
     padding: 1.75rem;
-    min-height: 420px;
+    min-height: 560px;
   }
 
   .hero-text h1 {
-    font-size: 1.8rem;
+    font-size: 1.9rem;
   }
 
   .hero-cards {
