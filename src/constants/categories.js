@@ -7,8 +7,7 @@ export const CATEGORIES = [
   { code: '25', label: '여행코스' },
   { code: '28', label: '레포츠' },
   { code: '32', label: '숙박' },
-  { code: '38', label: '쇼핑' },
-  { code: '39', label: '음식점' }
+  { code: '38', label: '쇼핑' }
 ]
 
 export function getCategoryLabel(code) {

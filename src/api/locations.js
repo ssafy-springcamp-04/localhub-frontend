@@ -74,6 +74,40 @@ export async function getDistricts(type) {
 }
 
 /**
+ * 지도 핀 데이터 조회 (경량, 계약서 §2-2)
+ * GET /api/locations/map?types={comma_separated}&district={district}&limit={limit}
+ * 좌표(mapx/mapy) 있는 항목만, 페이지네이션 없음.
+ * @param {object} p
+ * @param {string} [p.types] 콤마 구분 타입 (예: "12,38"). 미지정 시 전체.
+ * @param {string} [p.district] 구별 필터 (예: "종로구"). 미지정 시 전체.
+ * @param {number} [p.limit] 상한 (기본 500 — 핀 과다로 인한 브라우저 멈춤 방지)
+ * @returns {Promise<{items: Array<{id, content_type_id, title, mapx, mapy}>, total: number}>}
+ */
+export async function getMapPins({ types = '', district = '', limit = 500 } = {}) {
+  if (USE_MOCK) {
+    const typeList = types ? types.split(',').filter(Boolean) : null
+    const items = locationsData
+      .filter((it) => it.mapx != null && it.mapy != null)
+      .filter((it) => (typeList ? typeList.includes(it.content_type_id) : true))
+      .filter((it) => (district ? it.district === district : true))
+      .slice(0, limit)
+      .map((it) => ({
+        id: it.id,
+        content_type_id: it.content_type_id,
+        title: it.title,
+        mapx: it.mapx,
+        mapy: it.mapy
+      }))
+    return { items, total: items.length }
+  }
+
+  const { data } = await axios.get(`${API_BASE}/api/locations/map`, {
+    params: { types: types || undefined, district: district || undefined, limit }
+  })
+  return data
+}
+
+/**
  * 지역정보 좋아요 (계약서 §2-4)
  * POST /api/locations/{id}/like — 단순 카운트 증가
  * @returns {Promise<{id: number, likes: number}>}

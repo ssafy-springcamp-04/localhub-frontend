@@ -107,8 +107,7 @@ const LIKED_KEY = 'liked_locations'
 
 const route = useRoute()
 
-// 💡 백엔드/상수 데이터(CATEGORIES) 배열에서 음식점('39')을 미리 걸러내어 탭으로 그려냅니다.
-const categories = CATEGORIES.filter((c) => c.code !== '39')
+const categories = CATEGORIES
 
 const items = ref([])
 const total = ref(0)
