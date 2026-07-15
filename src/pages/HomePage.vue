@@ -15,17 +15,17 @@
       <div class="card home-card">
         <h2>지역 정보</h2>
         <p>서울의 다양한 지역 데이터를 카테고리별로 살펴보세요.</p>
-        <router-link to="/categories">자세히 보기</router-link>
+        <router-link to="/categories">자세히 보기 →</router-link>
       </div>
       <div class="card home-card">
         <h2>커뮤니티</h2>
         <p>관광 계획, 리뷰, 질문을 공유하고 게시글을 관리할 수 있습니다.</p>
-        <router-link to="/community">자세히 보기</router-link>
+        <router-link to="/community">자세히 보기 →</router-link>
       </div>
       <div class="card home-card">
         <h2>지도</h2>
         <p>Leaflet 지도로 서울 주요 명소를 한눈에 확인하세요.</p>
-        <router-link to="/map">자세히 보기</router-link>
+        <router-link to="/map">자세히 보기 →</router-link>
       </div>
     </div>
   </section>
@@ -39,37 +39,80 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
 }
 
+/* 메인 히어로 버튼 (브랜드 초록 테마 적용) */
 .hero-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.9rem 1.6rem;
+  padding: 0.9rem 1.75rem;
   border-radius: 999px;
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff; /* 가독성을 위해 흰색 글자 고정 */
   text-decoration: none;
   font-weight: 700;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.secondary {
-  background: rgba(255,255,255,0.1);
-  color: #f8fafc;
+.hero-button:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+/* 보조 버튼 (테마의 표면 컬러와 보더 조화) */
+.hero-button.secondary {
+  background: var(--surface-strong);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.hero-button.secondary:hover {
+  background: var(--border);
+}
+
+/* 개별 소개 카드 스타일 */
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.home-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
 }
 
 .home-card h2 {
-  margin-top: 0;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .home-card p {
-  color: #cbd5e1;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
 }
 
+/* 자세히 보기 링크 (포인트 초록 테마 적용) */
 .home-card a {
-  color: #7dd3fc;
+  align-self: flex-start;
+  margin-top: 0.75rem;
+  color: var(--active);
   text-decoration: none;
   font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.home-card a:hover {
+  color: var(--accent-strong);
 }
 </style>
