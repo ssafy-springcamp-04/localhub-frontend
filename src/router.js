@@ -18,7 +18,9 @@ const routes = [
   { path: '/map', component: MapPage },
   // 캘린더는 FullCalendar(무거운 의존성)를 쓰므로 지연 로딩 →
   // 이 페이지 문제가 나도 홈/다른 페이지는 영향받지 않도록 격리
-  { path: '/calendar', component: () => import('./pages/CalendarPage.vue') }
+  { path: '/calendar', component: () => import('./pages/CalendarPage.vue') },
+  // 대시보드도 Chart.js(무거운 의존성) 사용 → 지연 로딩으로 격리
+  { path: '/dashboard', component: () => import('./pages/DashboardPage.vue') }
 ]
 
 const router = createRouter({
