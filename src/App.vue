@@ -15,6 +15,7 @@
           <router-link to="/categories">지역정보</router-link>
           <router-link to="/community">커뮤니티</router-link>
           <router-link to="/map">지도</router-link>
+          <router-link to="/calendar">축제 캘린더</router-link>
         </nav>
       </div>
     </header>
