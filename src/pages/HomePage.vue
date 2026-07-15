@@ -1,7 +1,10 @@
 <template>
   <section>
     <div class="hero">
-      <div class="hero-overlay">
+      <!-- 배경 대신 실제 이미지로 넣어 잘리지 않고 전체가 보이도록 -->
+      <img class="hero-img" src="/hero-bg.png" alt="서울 전경 일러스트" />
+
+      <div class="hero-content">
         <div class="hero-text">
           <h1>서울 익스플로러</h1>
           <p>서울의 관광지, 레포츠, 문화시설, 쇼핑, 숙박, 축제공연행사 정보를 한 곳에서 확인하고, 커뮤니티와 챗봇으로 더 쉽게 계획하세요.</p>
@@ -36,35 +39,30 @@
 </script>
 
 <style scoped>
-/* 히어로: 첨부 일러스트를 배경으로 사용. 파일이 없으면 초록 그라디언트로 폴백 */
 .hero {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
   background-color: var(--surface-strong);
-  background-image:
-    linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(13, 148, 136, 0.12)),
-    url('/hero-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   box-shadow: 0 10px 30px var(--shadow);
 }
 
-/* 상단 텍스트는 밝은 배경 위에서 읽히도록, 하단은 카드가 앉도록 은은한 스크림 */
-.hero-overlay {
+/* 이미지 전체가 잘리지 않고 보이도록 (width 100%, 높이는 비율대로) */
+.hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 이미지 위에 텍스트(상단)와 카드(하단)를 겹쳐 배치 */
+.hero-content {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  min-height: 640px;
+  justify-content: space-between;
+  gap: 1.5rem;
   padding: 3rem;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0) 32%,
-    rgba(13, 21, 16, 0) 55%,
-    rgba(13, 21, 16, 0.4) 100%
-  );
 }
 
 /* 텍스트는 반투명 패널 위에 올려 배경 위에서도 또렷하게 */
@@ -92,9 +90,7 @@
   color: #1e3a29;
 }
 
-/* 카드를 히어로 박스 하단으로 밀어 배치 */
 .hero-cards {
-  margin-top: auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
@@ -153,11 +149,15 @@
   background: linear-gradient(135deg, #14b8a6, #0ea5e9);
 }
 
-/* 모바일: 카드 세로 정렬 + 히어로 여백 축소 */
-@media (max-width: 720px) {
-  .hero-overlay {
-    padding: 1.75rem;
-    min-height: 560px;
+/* 좁은 화면: 겹침을 풀고 이미지 → 텍스트 → 카드 순서로 세로 배치 */
+@media (max-width: 820px) {
+  .hero-content {
+    position: static;
+    padding: 1.5rem;
+  }
+
+  .hero-text {
+    max-width: none;
   }
 
   .hero-text h1 {
