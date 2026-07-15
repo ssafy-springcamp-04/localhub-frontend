@@ -78,22 +78,25 @@
   padding: 1.25rem;
   border-radius: 14px;
   text-decoration: none;
-  color: #ffffff;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  /* 구분용 옅은 색 포인트 (상단 얇은 라인) */
+  border-top: 3px solid var(--accent-soft);
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
-  filter: brightness(1.06);
+  border-color: var(--accent);
+  box-shadow: 0 12px 26px var(--shadow);
 }
 
 .feature-card h2 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .feature-card p {
@@ -101,27 +104,27 @@
   flex: 1;
   font-size: 0.9rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--text-muted);
 }
 
 .feature-more {
   margin-top: 0.6rem;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #ffffff;
+  color: var(--active);
 }
 
-/* 카드별 색상 (초록 계열에서 살짝씩 변주) */
+/* 카드별 상단 포인트 색 (옅게) */
 .feature-card.region {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-top-color: #86efac;
 }
 
 .feature-card.community {
-  background: linear-gradient(135deg, #10b981, #0d9488);
+  border-top-color: #5eead4;
 }
 
 .feature-card.map {
-  background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+  border-top-color: #7dd3fc;
 }
 
 /* 사진 박스: 이미지가 박스에 꽉 차도록 패딩 제거 */
