@@ -125,6 +125,23 @@ export async function likeLocation(id) {
 }
 
 /**
+ * 지역정보 좋아요 취소 (계약서 §2-4)
+ * POST /api/locations/{id}/unlike — 단순 카운트 감소 (0 미만 방지)
+ * @returns {Promise<{id: number, likes: number}>}
+ */
+export async function unlikeLocation(id) {
+  if (USE_MOCK) {
+    const item = locationsData.find((it) => String(it.id) === String(id))
+    if (!item) throw { response: { status: 404, data: { detail: '장소를 찾을 수 없습니다.' } } }
+    item.likes = Math.max(0, item.likes - 1)
+    return { id: item.id, likes: item.likes }
+  }
+
+  const { data } = await axios.post(`${API_BASE}/api/locations/${id}/unlike`)
+  return data
+}
+
+/**
  * 지역정보 단건 조회 (계약서 §2-3)
  * GET /api/locations/{id}
  */

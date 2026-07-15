@@ -75,8 +75,8 @@
             <button
               class="like-btn"
               :class="{ liked: isLiked(item.id) }"
-              :disabled="isLiked(item.id)"
-              @click="like(item)"
+              :title="isLiked(item.id) ? '추천 취소' : '추천'"
+              @click="toggleLike(item)"
             >
               ★ {{ item.likes }}
             </button>
@@ -90,7 +90,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { getLocations, getDistricts, likeLocation } from '../api/locations.js'
+import { getLocations, getDistricts, likeLocation, unlikeLocation } from '../api/locations.js'
 import { CATEGORIES, getCategoryLabel } from '../constants/categories.js'
 
 // 이미지 로드 실패 대비 인라인 SVG 플레이스홀더
@@ -134,15 +134,30 @@ function isLiked(id) {
   return likedIds.value.has(id)
 }
 
-async function like(item) {
-  if (isLiked(item.id)) return
+function persistLikedIds() {
+  localStorage.setItem(LIKED_KEY, JSON.stringify([...likedIds.value]))
+}
+
+// 추천 / 추천 취소 토글
+async function toggleLike(item) {
+  if (isLiked(item.id)) {
+    try {
+      const { likes } = await unlikeLocation(item.id)
+      item.likes = likes
+      likedIds.value.delete(item.id)
+      persistLikedIds()
+    } catch (err) {
+      // 추천 취소 실패 무시
+    }
+    return
+  }
   try {
     const { likes } = await likeLocation(item.id)
     item.likes = likes
     likedIds.value.add(item.id)
-    localStorage.setItem(LIKED_KEY, JSON.stringify([...likedIds.value]))
+    persistLikedIds()
   } catch (err) {
-    // 좋아요 실패 무시
+    // 추천 실패 무시
   }
 }
 
@@ -353,15 +368,21 @@ watch(
 }
 
 .place-thumb {
-  aspect-ratio: 3 / 2;
+  height: 200px;
   background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
+  /* 사진을 박스 안에서 가로·세로 가운데 정렬 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .place-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  /* 비율 유지하며 박스에 맞춰 축소 (포스터가 잘리지 않고 전체가 보임) */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
 }
 
@@ -371,6 +392,8 @@ watch(
   flex-direction: column;
   gap: 0.4rem;
   flex: 1;
+  /* 글씨는 카드 하단에 정렬 (썸네일 높이는 이미 통일됨) */
+  justify-content: flex-end;
 }
 
 .place-title-row {
