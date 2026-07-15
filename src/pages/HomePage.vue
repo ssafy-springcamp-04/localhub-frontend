@@ -27,14 +27,19 @@
       </router-link>
     </div>
 
-    <!-- 사진 박스 (박스에 꽉 차게, 잘림 없음) -->
+    <!-- 사진 박스 (테마에 따라 라이트/다크 이미지 교체, 잘림 없음) -->
     <div class="card photo-box">
-      <img class="hero-img" src="/hero-bg.png" alt="서울 전경 일러스트" />
+      <img class="hero-img" :src="heroSrc" alt="서울 전경 일러스트" />
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { isDarkTheme } from '../theme.js'
+
+// 테마에 따라 히어로 이미지 1장만 로드 (다크/라이트)
+const heroSrc = computed(() => (isDarkTheme.value ? '/hero-bg-dark.png' : '/hero-bg.png'))
 </script>
 
 <style scoped>
