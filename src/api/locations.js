@@ -21,7 +21,8 @@ const byName = (a, b) => a.title.localeCompare(b.title, 'ko')
  */
 export async function getLocations({ type, q = '', district = '', sort = 'name', page = 1, size = 12 } = {}) {
   if (USE_MOCK) {
-    let items = locationsData.filter((item) => item.content_type_id === type)
+    // type 미지정 시 전체 카테고리
+    let items = type ? locationsData.filter((item) => item.content_type_id === type) : [...locationsData]
     if (q) {
       const keyword = q.toLowerCase()
       items = items.filter((item) => item.title.toLowerCase().includes(keyword))

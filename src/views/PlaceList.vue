@@ -5,6 +5,7 @@
       <p>서울의 {{ typeLabel }} 정보를 카드로 확인하세요.</p>
 
       <nav class="type-tabs">
+        <router-link to="/places/all" class="type-tab">전체</router-link>
         <router-link
           v-for="c in categories"
           :key="c.code"
@@ -169,7 +170,11 @@ const pageNumbers = computed(() => {
 const likedIds = ref(new Set(JSON.parse(localStorage.getItem(LIKED_KEY) || '[]')))
 
 const currentType = computed(() => route.params.type)
-const typeLabel = computed(() => getCategoryLabel(currentType.value))
+// 'all' 은 전체 카테고리 → API 엔 type 을 넘기지 않음(undefined)
+const apiType = computed(() => (currentType.value === 'all' ? undefined : currentType.value))
+const typeLabel = computed(() =>
+  currentType.value === 'all' ? '전체 카테고리' : getCategoryLabel(currentType.value)
+)
 
 function onImgError(e) {
   if (e.target.src !== PLACEHOLDER) e.target.src = PLACEHOLDER
@@ -207,7 +212,7 @@ async function toggleLike(item) {
 }
 
 async function reload() {
-  const type = currentType.value
+  const type = apiType.value
   isLoading.value = true
   errorText.value = ''
   activeKeyword.value = searchText.value.trim()
@@ -264,7 +269,7 @@ watch(
     sort.value = 'name'
     page.value = 1
     try {
-      districts.value = (await getDistricts(type)).items
+      districts.value = (await getDistricts(apiType.value)).items
     } catch (err) {
       districts.value = []
     }
