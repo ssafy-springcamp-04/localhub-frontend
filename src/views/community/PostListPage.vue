@@ -136,20 +136,47 @@ watch(
   gap: 1rem;
 }
 
+.list-head h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.list-head p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 1.2rem;
+  margin-top: 1.5rem;
 }
 
+/* 드롭다운 및 입력 필드 공통화 */
 .filters select,
 .search input {
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
+}
+
+.filters select:focus,
+.search input:focus {
+  border-color: var(--accent);
+}
+
+.filters select option {
+  background: var(--surface-strong);
+  color: var(--text);
 }
 
 .search {
@@ -163,17 +190,32 @@ watch(
   flex: 1;
 }
 
+.search input::placeholder {
+  color: var(--muted);
+}
+
+/* 버튼 스타일 (브랜드 초록색 포인트 매칭) */
 .search button,
 .btn.primary {
   border: none;
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff; /* 가독성을 위한 흰색 텍스트 고정 */
   border-radius: 999px;
-  padding: 0.7rem 1.2rem;
+  padding: 0.7rem 1.3rem;
   font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.search button:hover,
+.btn.primary:hover {
+  background: var(--accent-strong);
 }
 
 .post-list {
@@ -181,37 +223,43 @@ watch(
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
+/* 개별 리스트 아이템 */
 .post-link {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.9rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-strong);
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .post-link:hover {
-  border-color: rgba(56, 189, 248, 0.5);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
+/* 카테고리 배지 - 연한 초록 기반 */
 .badge {
   font-size: 0.78rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #7dd3fc;
+  background: var(--accent-soft);
+  color: var(--active);
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .post-title {
   font-weight: 600;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -219,28 +267,38 @@ watch(
 
 .post-meta {
   display: flex;
-  gap: 0.9rem;
-  color: #94a3b8;
+  gap: 1rem;
+  color: var(--text-muted);
   font-size: 0.85rem;
   white-space: nowrap;
 }
 
+/* 페이저 컴포넌트 */
 .pager {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  color: #cbd5e1;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .pager button {
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: transparent;
-  color: #e2e8f0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   border-radius: 999px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pager button:hover:not(:disabled) {
+  border-color: var(--text-muted);
+  background: var(--surface-strong);
 }
 
 .pager button:disabled {
@@ -250,20 +308,32 @@ watch(
 
 .state-msg {
   text-align: center;
-  color: #94a3b8;
-  padding: 2rem 0;
+  color: var(--text-muted);
+  padding: 3rem 0;
+  font-weight: 500;
 }
 
 .state-msg.error {
-  color: #fca5a5;
+  color: #ef4444;
 }
 
 @media (max-width: 640px) {
   .list-head {
     flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
   }
+  
+  .btn.primary {
+    align-self: flex-start;
+  }
+
   .post-meta {
     display: none;
+  }
+  
+  .post-link {
+    grid-template-columns: auto 1fr;
   }
 }
 </style>

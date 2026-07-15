@@ -64,73 +64,108 @@ async function submit() {
 </script>
 
 <style scoped>
+/* 모달 배후 레이어 */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.7);
+  background: rgba(13, 21, 16, 0.75); /* 테마에 맞춰 딥 그린이 가미된 어두운 투명 백드롭 */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
   z-index: 1100;
+  backdrop-filter: blur(4px); /* 뒷배경을 부드럽게 뭉개 입체감 상승 */
 }
 
+/* 모달 본체 */
 .modal {
   width: min(420px, 100%);
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 18px;
-  padding: 1.5rem;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px var(--shadow);
+  color: var(--text);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .modal-title {
   margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .modal-desc {
-  margin: 0 0 1rem;
-  color: #94a3b8;
+  margin: 0 0 1.25rem;
+  color: var(--text-muted);
   font-size: 0.92rem;
+  line-height: 1.45;
 }
 
+/* 비밀번호 입력창 */
 .modal input {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
 }
 
+.modal input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 에러 텍스트 */
 .modal-error {
-  color: #fca5a5;
-  font-size: 0.9rem;
+  color: #ef4444; /* 명확한 경고용 레드 */
+  font-size: 0.85rem;
   margin: 0.6rem 0 0;
+  font-weight: 500;
 }
 
+/* 액션 버튼 그룹 */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
-  margin-top: 1.2rem;
+  margin-top: 1.5rem;
 }
 
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 0.7rem 1.2rem;
+  padding: 0.7rem 1.25rem;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
+/* 확인 (초록 포인트) 버튼 */
 .btn.primary {
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff;
 }
 
+.btn.primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+/* 취소 버튼 */
 .btn.ghost {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
 }
 
 .btn:disabled {

@@ -93,20 +93,23 @@ import { useRoute } from 'vue-router'
 import { getLocations, getDistricts, likeLocation } from '../api/locations.js'
 import { CATEGORIES, getCategoryLabel } from '../constants/categories.js'
 
-// 이미지 결측/로드 실패 대비 인라인 SVG 플레이스홀더 (쇼핑·음식점에 결측 다수)
+// 이미지 로드 실패 대비 인라인 SVG 플레이스홀더
 const PLACEHOLDER =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260">
-      <rect width="100%" height="100%" fill="#1e293b"/>
-      <text x="50%" y="50%" fill="#64748b" font-family="sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">이미지 준비 중</text>
+      <rect width="100%" height="100%" fill="#142219"/>
+      <text x="50%" y="50%" fill="#708573" font-family="sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">이미지 준비 중</text>
     </svg>`
   )
 
 const LIKED_KEY = 'liked_locations'
 
 const route = useRoute()
-const categories = CATEGORIES
+
+// 💡 백엔드/상수 데이터(CATEGORIES) 배열에서 음식점('39')을 미리 걸러내어 탭으로 그려냅니다.
+const categories = CATEGORIES.filter((c) => c.code !== '39')
+
 const items = ref([])
 const total = ref(0)
 const districts = ref([])
@@ -118,7 +121,7 @@ const activeKeyword = ref('') // 실제 적용된 검색어
 const district = ref('') // 구별 필터
 const sort = ref('name') // 정렬 (name | likes)
 
-// 좋아요 중복 방지(best-effort) — localStorage 에 누른 id 저장 (계약서 §2-4)
+// 좋아요 중복 방지
 const likedIds = ref(new Set(JSON.parse(localStorage.getItem(LIKED_KEY) || '[]')))
 
 const currentType = computed(() => route.params.type)
@@ -140,7 +143,7 @@ async function like(item) {
     likedIds.value.add(item.id)
     localStorage.setItem(LIKED_KEY, JSON.stringify([...likedIds.value]))
   } catch (err) {
-    // 좋아요 실패는 조용히 무시 (익명 카운트, 재시도 가능)
+    // 좋아요 실패 무시
   }
 }
 
@@ -196,33 +199,45 @@ watch(
 </script>
 
 <style scoped>
+/* 상단 카테고리 탭 영역 */
 .type-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
 }
 
 .type-tab {
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 1rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
+.type-tab:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* 활성화 상태의 탭 - 포인트 초록색 지정 */
 .type-tab.router-link-active {
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
   font-weight: 600;
 }
 
+/* 정렬 및 검색 영역 */
 .place-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
 }
 
 .place-search {
@@ -235,27 +250,51 @@ watch(
 .place-search input {
   flex: 1;
   min-width: 0;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
+}
+
+.place-search input:focus {
+  border-color: var(--accent);
+}
+
+.place-search input::placeholder {
+  color: var(--muted);
 }
 
 .place-search button {
   border: none;
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent);
+  color: #ffffff;
   border-radius: 999px;
-  padding: 0.7rem 1.2rem;
+  padding: 0.7rem 1.3rem;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.2s ease;
 }
 
+.place-search button:hover {
+  background: var(--accent-strong);
+}
+
+/* 검색어 초기화용 서브 버튼 */
 .place-search button.ghost {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.place-search button.ghost:hover {
+  color: var(--text);
+  background: var(--border);
 }
 
 .place-filters {
@@ -264,36 +303,60 @@ watch(
 }
 
 .place-filters select {
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg);
+  color: var(--text);
   cursor: pointer;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
 }
 
+.place-filters select:focus {
+  border-color: var(--accent);
+}
+
+.place-filters select option {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+/* 데이터 결과 카운트 */
 .result-count {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0 0 1.25rem;
+  font-weight: 500;
 }
 
 .result-count strong {
-  color: #e2e8f0;
+  color: var(--accent);
 }
 
+/* 장소 카드 디자인 */
 .place-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 16px var(--shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.place-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px var(--shadow);
 }
 
 .place-thumb {
   aspect-ratio: 3 / 2;
-  background: #1e293b;
+  background: var(--surface-strong);
+  border-bottom: 1px solid var(--border);
 }
 
 .place-thumb img {
@@ -304,55 +367,74 @@ watch(
 }
 
 .place-body {
-  padding: 1rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
+  flex: 1;
 }
 
 .place-title-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
 }
 
 .place-body h2 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* 구 정보 배지 - 연한 브랜드 초록색 */
 .badge-district {
   flex-shrink: 0;
   font-size: 0.75rem;
-  padding: 0.2rem 0.55rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.18);
-  color: #cbd5e1;
+  background: var(--accent-soft);
+  color: var(--active);
 }
 
 .addr {
   margin: 0;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.9rem;
+  line-height: 1.45;
 }
 
+/* 전화번호 텍스트 (포인트 초록색) */
 .tel {
   margin: 0;
-  color: #7dd3fc;
+  color: var(--active);
   font-size: 0.85rem;
+  font-weight: 600;
 }
 
+/* 좋아요 버튼 */
 .like-btn {
   align-self: flex-start;
   margin-top: 0.5rem;
-  border: 1px solid rgba(250, 204, 21, 0.5);
+  border: 1px solid rgba(250, 204, 21, 0.4);
   background: transparent;
   color: #facc15;
   border-radius: 999px;
-  padding: 0.4rem 0.9rem;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover:not(:disabled) {
+  background: rgba(250, 204, 21, 0.1);
+  border-color: #facc15;
 }
 
 .like-btn.liked {
@@ -364,11 +446,12 @@ watch(
 
 .state-msg {
   text-align: center;
-  color: #94a3b8;
-  padding: 2rem 0;
+  color: var(--text-muted);
+  padding: 3rem 0;
+  font-weight: 500;
 }
 
 .state-msg.error {
-  color: #fca5a5;
+  color: #ef4444;
 }
 </style>

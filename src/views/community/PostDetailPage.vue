@@ -115,38 +115,52 @@ watch(() => route.params.id, load, { immediate: true })
   margin-bottom: 1rem;
 }
 
+/* 카테고리 배지 - 초록 테마 연동 */
 .badge {
   font-size: 0.8rem;
-  padding: 0.3rem 0.7rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 999px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #7dd3fc;
+  background: var(--accent-soft);
+  color: var(--active);
+  font-weight: 600;
 }
 
 .back-link {
-  color: #94a3b8;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--text);
 }
 
 .detail-title {
   margin: 0 0 0.7rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .detail-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  color: #94a3b8;
-  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
   padding-bottom: 1.2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.25s ease;
 }
 
 .detail-content {
   white-space: pre-wrap;
-  line-height: 1.7;
-  margin: 1.4rem 0 2rem;
+  line-height: 1.75;
+  margin: 1.5rem 0 2.5rem;
+  font-size: 1.05rem;
+  color: var(--text);
 }
 
 .detail-actions {
@@ -158,28 +172,44 @@ watch(() => route.params.id, load, { immediate: true })
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 0.7rem 1.3rem;
+  padding: 0.7rem 1.4rem;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
+/* 수정(기본) 버튼 */
 .btn.ghost {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
 }
 
+.btn.ghost:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+/* 삭제(Danger) 버튼 */
 .btn.danger {
-  background: rgba(248, 113, 113, 0.9);
-  color: #450a0a;
+  background: #ef4444;
+  color: #ffffff; /* 라이트 모드 가독성을 위해 흰색 글자 고정 */
 }
 
+.btn.danger:hover {
+  background: #dc2626;
+}
+
+/* 페이지 로딩 및 에러 상태 영역 */
 .state-msg {
   text-align: center;
-  color: #94a3b8;
-  padding: 2rem 0;
+  color: var(--text-muted);
+  padding: 3rem 0;
+  font-weight: 500;
 }
 
 .state-msg.error {
-  color: #fca5a5;
+  color: #ef4444;
 }
 </style>

@@ -2,7 +2,7 @@
   <section>
     <div class="card">
       <h1>서울 지역 정보</h1>
-      <p>서울의 관광지·문화시설·축제·쇼핑·숙박·음식점 등 8개 카테고리 정보를 확인하세요.</p>
+      <p>서울의 관광지·문화시설·축제·쇼핑·숙박 등 7개 카테고리 정보를 확인하세요.</p>
     </div>
   </section>
 
@@ -33,46 +33,65 @@ const DESCRIPTIONS = {
   '25': { emoji: '🗺️', description: '테마별 여행 코스를 따라 서울을 둘러보세요.' },
   '28': { emoji: '🚴', description: '한강·북한산 등 도심 속 레포츠 정보입니다.' },
   '32': { emoji: '🏨', description: '호텔·게스트하우스 등 서울 숙박 정보입니다.' },
-  '38': { emoji: '🛍️', description: '전통시장부터 쇼핑 명소까지 소개합니다.' },
-  '39': { emoji: '🍽️', description: '서울의 맛집과 먹거리 골목을 확인하세요.' }
+  '38': { emoji: '🛍️', description: '전통시장부터 쇼핑 명소까지 소개합니다.' }
+  // 💡 음식점('39') 항목을 완전히 제외했습니다.
 }
 
-const categories = CATEGORIES.map((c) => ({ ...c, ...DESCRIPTIONS[c.code] }))
+// 백엔드/상수 데이터(CATEGORIES) 목록에서 음식점을 제외하고 DESCRIPTIONS에 매칭되는 7개 카테고리만 노출합니다.
+const categories = CATEGORIES
+  .filter((c) => c.code !== '39')
+  .map((c) => ({ ...c, ...DESCRIPTIONS[c.code] }))
 </script>
 
 <style scoped>
+/* 개별 카테고리 카드 */
 .category-card {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* 마우스 호버 시 초록빛 테두리와 그림자, 부드러운 리프트업 */
 .category-card:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  transform: translateY(-2px);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px var(--shadow);
 }
 
 .category-emoji {
-  font-size: 1.8rem;
+  font-size: 2rem;
+  margin-bottom: 0.2rem;
 }
 
 .category-card h2 {
-  margin: 0.2rem 0 0;
-  font-size: 1.2rem;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
+/* 설명문 - 테마별 텍스트 색상 연동 */
 .category-card p {
-  color: #cbd5e1;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
   flex: 1;
 }
 
+/* 바로가기 링크 - 포인트 초록색으로 변경 */
 .category-go {
-  margin-top: 0.6rem;
-  color: #7dd3fc;
+  margin-top: 0.8rem;
+  color: var(--active);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.category-card:hover .category-go {
+  color: var(--accent-strong);
 }
 </style>
