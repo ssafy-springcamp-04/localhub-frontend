@@ -50,8 +50,11 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { getMapPins, getDistricts } from '../api/locations.js'
 import { CATEGORIES } from '../constants/categories.js'
+
+const router = useRouter()
 
 const mapContainer = ref(null)
 let mapInstance = null
@@ -187,6 +190,11 @@ const updateMarkers = (pins, fit) => {
       infowindow.open(mapInstance, marker)
     )
     window.kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close())
+
+    // 핀 클릭 → 해당 장소의 지역정보 목록으로 이동 (장소명으로 검색 적용)
+    window.kakao.maps.event.addListener(marker, 'click', () => {
+      router.push({ path: `/places/${place.content_type_id}`, query: { q: place.title } })
+    })
 
     bounds.extend(position)
     return marker
