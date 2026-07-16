@@ -215,13 +215,17 @@ function retry() {
   padding: 0.75rem 1rem;
   border-radius: 16px;
   max-width: 85%;
-  line-height: 1.5;
+  line-height: 1.6;
   font-size: 0.95rem;
-  word-break: break-all;
+  /* 한글은 단어 단위로 줄바꿈, 긴 URL 등 예외적 토큰만 강제 줄바꿈 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .bubble p {
   margin: 0;
+  /* 챗봇 답변의 개행(\n)·목록 서식을 그대로 표시 */
+  white-space: pre-wrap;
 }
 
 /* 어시스턴트(AI) 말풍선 - 연한 브랜드 컬러 배경 */
