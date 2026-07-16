@@ -25,6 +25,61 @@
     </div>
   </section>
 
+  <!-- 댓글 -->
+  <section v-if="post" class="card comment-card">
+    <h2 class="comment-title">댓글 <span class="comment-count">{{ comments.length }}</span></h2>
+
+    <form class="comment-form" @submit.prevent="submitComment">
+      <textarea
+        v-model="newComment.content"
+        placeholder="댓글을 입력하세요 (최대 500자)"
+        maxlength="500"
+        rows="2"
+        :disabled="posting"
+      ></textarea>
+      <div class="comment-form-row">
+        <input
+          v-model="newComment.password"
+          type="password"
+          placeholder="비밀번호 (4~20자)"
+          :disabled="posting"
+        />
+        <button type="submit" class="btn primary" :disabled="posting || !canSubmit">등록</button>
+      </div>
+      <p v-if="commentError" class="comment-error">{{ commentError }}</p>
+    </form>
+
+    <p v-if="!comments.length" class="comment-empty">첫 댓글을 남겨보세요.</p>
+    <ul v-else class="comment-list">
+      <li v-for="c in comments" :key="c.id" class="comment-item">
+        <template v-if="editing && editing.id === c.id">
+          <textarea
+            v-model="editing.content"
+            class="comment-edit-area"
+            maxlength="500"
+            rows="2"
+          ></textarea>
+          <div class="comment-item-actions">
+            <button class="link-btn" :disabled="savingEdit || !editing.content.trim()" @click="saveEdit">저장</button>
+            <button class="link-btn" @click="editing = null">취소</button>
+          </div>
+        </template>
+        <template v-else>
+          <p class="comment-content">{{ c.content }}</p>
+          <div class="comment-item-foot">
+            <span class="comment-date">
+              {{ formatDate(c.updated_at || c.created_at) }}<span v-if="c.updated_at"> (수정됨)</span>
+            </span>
+            <div class="comment-item-actions">
+              <button class="link-btn" @click="openCommentModal('edit', c.id)">수정</button>
+              <button class="link-btn danger" @click="openCommentModal('delete', c.id)">삭제</button>
+            </div>
+          </div>
+        </template>
+      </li>
+    </ul>
+  </section>
+
   <PasswordModal
     v-if="modal"
     :title="modal === 'delete' ? '게시글 삭제' : '수정 전 확인'"
@@ -36,12 +91,31 @@
     @close="modal = ''"
     @success="onModalSuccess"
   />
+
+  <PasswordModal
+    v-if="commentModal"
+    :title="commentModal.mode === 'delete' ? '댓글 삭제' : '댓글 수정 확인'"
+    :description="commentModal.mode === 'delete'
+      ? '삭제하려면 작성 시 비밀번호를 입력하세요. 삭제 후 되돌릴 수 없습니다.'
+      : '수정하려면 작성 시 비밀번호를 입력하세요.'"
+    :confirm-label="commentModal.mode === 'delete' ? '삭제' : '확인'"
+    :on-submit="commentModalSubmit"
+    @close="commentModal = null"
+    @success="onCommentModalSuccess"
+  />
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getPost, verifyPassword, deletePost } from '../../api/posts.js'
+import {
+  getComments,
+  createComment,
+  verifyCommentPassword,
+  updateComment,
+  deleteComment
+} from '../../api/comments.js'
 import { getCategoryLabel } from '../../constants/categories.js'
 import PasswordModal from '../../components/community/PasswordModal.vue'
 
@@ -52,6 +126,21 @@ const post = ref(null)
 const isLoading = ref(false)
 const errorText = ref('')
 const modal = ref('') // '' | 'edit' | 'delete'
+
+// ---- 댓글 상태 ----
+const comments = ref([])
+const newComment = ref({ content: '', password: '' })
+const posting = ref(false)
+const commentError = ref('')
+const commentModal = ref(null) // { mode: 'edit'|'delete', id } | null
+const editing = ref(null) // { id, password, content } | null
+const savingEdit = ref(false)
+
+const canSubmit = computed(
+  () =>
+    newComment.value.content.trim().length > 0 &&
+    newComment.value.password.trim().length >= 4
+)
 
 function categoryLabel(code) {
   return getCategoryLabel(code)
@@ -91,12 +180,86 @@ function onModalSuccess({ password }) {
   }
 }
 
+// ---- 댓글 로직 ----
+async function loadComments() {
+  try {
+    const { items } = await getComments(route.params.id)
+    comments.value = items
+  } catch (err) {
+    comments.value = []
+  }
+}
+
+async function submitComment() {
+  if (posting.value || !canSubmit.value) return
+  posting.value = true
+  commentError.value = ''
+  try {
+    await createComment(route.params.id, {
+      content: newComment.value.content.trim(),
+      password: newComment.value.password
+    })
+    newComment.value = { content: '', password: '' }
+    await loadComments()
+  } catch (err) {
+    commentError.value = err.response?.data?.detail ?? '댓글 등록에 실패했습니다.'
+  } finally {
+    posting.value = false
+  }
+}
+
+function openCommentModal(mode, id) {
+  editing.value = null
+  commentError.value = ''
+  commentModal.value = { mode, id }
+}
+
+// 삭제면 바로 삭제, 수정이면 비밀번호 검증 (PasswordModal 이 호출)
+function commentModalSubmit(password) {
+  const { mode, id } = commentModal.value
+  if (mode === 'delete') return deleteComment(id, password)
+  return verifyCommentPassword(id, password)
+}
+
+function onCommentModalSuccess({ password }) {
+  const { mode, id } = commentModal.value
+  commentModal.value = null
+  if (mode === 'delete') {
+    loadComments()
+  } else {
+    const target = comments.value.find((c) => c.id === id)
+    editing.value = { id, password, content: target ? target.content : '' }
+  }
+}
+
+async function saveEdit() {
+  if (savingEdit.value || !editing.value.content.trim()) return
+  savingEdit.value = true
+  commentError.value = ''
+  try {
+    await updateComment(editing.value.id, {
+      password: editing.value.password,
+      content: editing.value.content.trim()
+    })
+    editing.value = null
+    await loadComments()
+  } catch (err) {
+    commentError.value = err.response?.data?.detail ?? '댓글 수정에 실패했습니다.'
+  } finally {
+    savingEdit.value = false
+  }
+}
+
 async function load() {
   isLoading.value = true
   errorText.value = ''
   post.value = null
+  comments.value = []
+  editing.value = null
+  commentModal.value = null
   try {
     post.value = await getPost(route.params.id)
+    await loadComments()
   } catch (err) {
     errorText.value = err.response?.data?.detail ?? '게시글을 불러오지 못했습니다.'
   } finally {
@@ -211,5 +374,149 @@ watch(() => route.params.id, load, { immediate: true })
 
 .state-msg.error {
   color: #ef4444;
+}
+
+/* ---- 댓글 ---- */
+.comment-card {
+  margin-top: 1.25rem;
+}
+
+.comment-title {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comment-count {
+  color: var(--active);
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.comment-form textarea,
+.comment-edit-area {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
+}
+
+.comment-form textarea:focus,
+.comment-edit-area:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.comment-form-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.comment-form-row input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.comment-form-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.comment-error {
+  margin: 0;
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.comment-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 0.92rem;
+}
+
+.comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.comment-item {
+  border-top: 1px solid var(--border);
+  padding-top: 0.9rem;
+}
+
+.comment-content {
+  margin: 0 0 0.5rem;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.comment-item-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.comment-date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.comment-item-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.comment-edit-area {
+  margin-bottom: 0.5rem;
+}
+
+.link-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.link-btn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.link-btn.danger:hover:not(:disabled) {
+  color: #ef4444;
+}
+
+.link-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
