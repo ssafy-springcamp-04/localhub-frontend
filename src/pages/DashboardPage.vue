@@ -10,6 +10,27 @@
   <p v-else-if="error" class="state-msg error">통계를 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.</p>
 
   <template v-else>
+    <section v-if="trendingPlaces.length" class="card trend-card">
+      <div class="trending-header">
+        <div>
+          <p class="eyebrow">실시간 인기</p>
+          <h2>추천 Top 10 장소</h2>
+        </div>
+        <span class="live-pill">LIVE</span>
+      </div>
+      <div class="ticker-viewport">
+        <div class="ticker-track" :style="{ transform: `translateY(-${activeIndex * 74}px)` }">
+          <div v-for="(place, index) in trendingPlaces" :key="place.title" class="ticker-slide">
+            <div class="ticker-rank">{{ index + 1 }}</div>
+            <div class="ticker-body">
+              <div class="ticker-title">{{ place.title }}</div>
+              <div class="ticker-meta">{{ place.likes }} 추천</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- KPI 타일 -->
     <section class="kpi-grid">
       <div class="card kpi">
@@ -78,6 +99,8 @@ const PALETTE = [
 const loading = ref(true)
 const error = ref(false)
 const stats = ref(null)
+const trendingPlaces = ref([])
+const activeIndex = ref(0)
 
 const catCanvas = ref(null)
 const distCanvas = ref(null)
@@ -86,6 +109,7 @@ const postCanvas = ref(null)
 const festCanvas = ref(null)
 
 let charts = []
+let intervalId = null
 
 const fmt = (n) => (n ?? 0).toLocaleString('ko-KR')
 const trim = (s, n = 14) => (s.length > n ? s.slice(0, n) + '…' : s)
@@ -189,14 +213,25 @@ async function renderAll() {
 onMounted(async () => {
   try {
     stats.value = await getStats()
+    trendingPlaces.value = (stats.value?.top_liked || []).slice(0, 10)
   } catch (err) {
     error.value = true
   } finally {
     loading.value = false
+<<<<<<< HEAD
   }5c98d20 (fix(dashboard): 차트가 안 그려지던 문제 수정)
   // loading=false 로 v-else(차트 영역)가 렌더된 뒤에 차트 생성
   // (renderAll 내부의 nextTick 이 DOM 반영을 기다림)
+=======
+  }
+
+>>>>>>> c80bf4f (feat: add weather and trending places cards to home dashboard)
   if (stats.value) await renderAll()
+  if (trendingPlaces.value.length > 1) {
+    intervalId = setInterval(() => {
+      activeIndex.value = (activeIndex.value + 1) % trendingPlaces.value.length
+    }, 2600)
+  }
 })
 
 // 테마 전환 시 차트 색 갱신
@@ -204,7 +239,10 @@ watch(isDarkTheme, () => {
   if (stats.value) renderAll()
 })
 
-onBeforeUnmount(destroyCharts)
+onBeforeUnmount(() => {
+  destroyCharts()
+  if (intervalId) clearInterval(intervalId)
+})
 </script>
 
 <style scoped>
@@ -217,6 +255,96 @@ onBeforeUnmount(destroyCharts)
 
 .state-msg.error {
   color: #ef4444;
+}
+
+.trend-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.trending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.trending-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.live-pill {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.ticker-viewport {
+  overflow: hidden;
+  height: 74px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.08);
+  padding: 0 0.5rem;
+}
+
+.ticker-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.6s ease;
+}
+
+.ticker-slide {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  height: 74px;
+  padding: 0 0.25rem;
+}
+
+.ticker-rank {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ticker-body {
+  min-width: 0;
+}
+
+.ticker-title {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticker-meta {
+  font-size: 0.84rem;
+  color: var(--text-muted);
 }
 
 /* KPI 타일 */
