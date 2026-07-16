@@ -1,0 +1,19 @@
+# Netlify 배포 설정 (localhub-frontend)
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 은 Node 20.12+ 필요 → 팀과 동일한 24.18.0 고정 (기본 Node 로는 빌드 실패)
+  NODE_VERSION = "24.18.0"
+  # 실서버 모드(목 데이터 비활성). 백엔드 주소(VITE_API_BASE_URL)는
+  # Netlify 대시보드 Environment variables 에서 Render 백엔드 URL 로 설정.
+  VITE_USE_MOCK = "false"
+
+# SPA(history 모드) — 존재하지 않는 경로 요청을 index.html 로 폴백해
+# /calendar, /dashboard 등에서 새로고침 시 404 방지
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
