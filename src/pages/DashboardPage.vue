@@ -219,7 +219,8 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
-
+  // loading=false 로 v-else(차트 영역)가 렌더된 뒤에 차트 생성
+  // (renderAll 내부의 nextTick 이 DOM 반영을 기다림)
   if (stats.value) await renderAll()
   if (trendingPlaces.value.length > 1) {
     intervalId = setInterval(() => {
